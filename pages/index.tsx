@@ -1,7 +1,6 @@
 function index() {
   return ( 
-    <>
-    </>
+    <></>
    );
 }
 
