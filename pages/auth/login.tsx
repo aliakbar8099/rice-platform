@@ -18,14 +18,14 @@ import { validatePhoneNumber } from '../../utils/helpers';
 
 function Login() {
     const [isPhone, setIsPhone] = React.useState<Boolean>(false);
-    const [phone, setPhone] = React.useState<string>("");
+    // const [phone, setPhone] = React.useState<string>("");
 
     React.useEffect(() => {
 
     }, [])
 
     function getChangeValue(e: React.ChangeEvent<HTMLInputElement>): void {
-        setPhone(e.target.value);
+        // setPhone(e.target.value);
         setIsPhone(validatePhoneNumber(e.target.value));
     }
 
