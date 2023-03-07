@@ -1,0 +1,113 @@
+@import "../public/font/anjoman/index.css";
+@import "./tailwind.css";
+@import "./components.scss";
+
+// varibale color
+$primaryColor: #76B947;
+$secondaryColor: #94C973;
+$TextColor: #2F5233;
+$baseColor: #B1D8B7;
+
+// reset 
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Anjoman !important;
+}
+
+html , body {
+    height: 100%;
+}
+
+.bg-primaryColor {
+    background: $primaryColor;
+}
+
+@import "../public/font/anjoman/index.css";
+@import "./tailwind.css";
+
+// varibale color
+$primaryColor: #76B947;
+$secondaryColor: #94C973;
+$TextColor: #2F5233;
+$baseColor: #B1D8B7;
+
+// reset 
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Anjoman;
+}
+
+.bg-primaryColor {
+    background-color: $primaryColor;
+}
+
+.bg-secondaryColor {
+    background-color: $secondaryColor;
+}
+
+.text-TextColor {
+    color: $TextColor;
+}
+
+.base-baseColor {
+    background-color: $baseColor;
+}
+
+.one_load {
+    h2 {
+        animation: 0.5s;
+        animation: one-l 1s ease;
+        transform: translateY(-20px) scale(1.5);
+    }
+
+    > div {
+        animation: one-l2 1s ease;
+    }
+}
+
+@keyframes one-l {
+    0% {
+        transform: translateY(50px) scale(1);
+    }
+
+    50% {
+        transform: translateY(50px) scale(1.2);
+    }
+
+    100% {
+        transform: translateY(-20px) scale(1.5);
+    }
+}
+
+@keyframes one-l2 {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.ani-showpage {
+    animation: ani-showpage 0.25s ease;
+}
+
+@keyframes ani-showpage {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
