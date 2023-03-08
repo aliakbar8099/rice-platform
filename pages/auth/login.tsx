@@ -13,25 +13,24 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { validatePhoneNumber, countdown } from 'utils/helpers';
+import { validatePhoneNumber } from 'utils/helpers';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
-import { NextRouter, useRouter } from 'next/router';
 import VerificationInput from "react-verification-input";
 
-function numberToSmerinke(number: number): string {
-    const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
-    const digitsArr = String(number).split('');
-    const smerinkeArr = digitsArr.map((digit: any) => smerinkeDigits[digit]);
-    return smerinkeArr.join('');
-}
+// function numberToSmerinke(number: number): string {
+//     const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
+//     const digitsArr = String(number).split('');
+//     const smerinkeArr = digitsArr.map((digit: any) => smerinkeDigits[digit]);
+//     return smerinkeArr.join('');
+// }
 
-function smerinkeToNumber(smerinkeString: string): number {
-    const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
-    const smerinkeArr = smerinkeString.split('');
-    const digitsArr = smerinkeArr.map(smerinke => smerinkeDigits.indexOf(smerinke));
-    const number = parseInt(digitsArr.join(''), 10);
-    return number;
-}
+// function smerinkeToNumber(smerinkeString: string): number {
+//     const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
+//     const smerinkeArr = smerinkeString.split('');
+//     const digitsArr = smerinkeArr.map(smerinke => smerinkeDigits.indexOf(smerinke));
+//     const number = parseInt(digitsArr.join(''), 10);
+//     return number;
+// }
 
 function Login() {
     const [phone, setPhone] = React.useState<string>("");
