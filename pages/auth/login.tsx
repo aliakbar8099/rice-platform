@@ -92,10 +92,6 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
 
     }
 
-    interface OutlinedInputProps {
-        error?: boolean | Boolean;
-    }
-
 
     return (
         <>
