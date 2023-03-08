@@ -1,23 +1,23 @@
 // import clientPromise from 'lib/mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-interface IBody {
-    main: {
-        phoneNumber: string | null,
-        password?: string | null,
-        verificationCode: string | null,
-    },
-    default: {
-        firsName: string | null,
-        lastName: string | null,
-        nativeCode: string | null,
-        adderess: string | null,
-        city: string | null,
-        persenImg: string | null,
-        email: string | null,
-        timeCreateAccount: string
-    }
-}
+// interface IBody {
+//     main: {
+//         phoneNumber: string | null,
+//         password?: string | null,
+//         verificationCode: string | null,
+//     },
+//     default: {
+//         firsName: string | null,
+//         lastName: string | null,
+//         nativeCode: string | null,
+//         adderess: string | null,
+//         city: string | null,
+//         persenImg: string | null,
+//         email: string | null,
+//         timeCreateAccount: string
+//     }
+// }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // const client = await clientPromise;
