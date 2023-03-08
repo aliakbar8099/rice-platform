@@ -10,13 +10,18 @@
     "@emotion/styled": "^11.10.6",
     "@mui/material": "^5.11.12",
     "@mui/styled-engine-sc": "^5.11.11",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "^4.8.1",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-transition-group": "^4.4.5",
+    "react-verification-input": "^3.3.0",
     "sass": "^1.58.3",
     "styled-components": "^5.3.8",
-    "stylis-plugin-rtl": "^2.1.1"
+    "stylis-plugin-rtl": "^2.1.1",
+    "trez-sms-client": "^1.0.4"
   },
   "devDependencies": {
     "@types/node": "18.7.5",

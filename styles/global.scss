@@ -16,7 +16,8 @@ $baseColor: #B1D8B7;
     font-family: Anjoman !important;
 }
 
-html , body {
+html,
+body {
     height: 100%;
 }
 
@@ -64,7 +65,7 @@ $baseColor: #B1D8B7;
         transform: translateY(-20px) scale(1.5);
     }
 
-    > div {
+    >div {
         animation: one-l2 1s ease;
     }
 }
@@ -106,8 +107,68 @@ $baseColor: #B1D8B7;
         opacity: 0;
         transform: translateY(100px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0px);
+    }
+}
+
+.page-enter {
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+    opacity: 1;
+    transform: translateY(0px);
+}
+
+.page-exit-active {
+    opacity: 0;
+    transform: translateY(-100px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+:where(.vi__wrapper) {
+    margin: auto !important;
+}
+
+:where(.vi__container) {
+    display: flex !important;
+    gap: 8px !important;
+    height: 50px !important;
+    width: 250px !important;
+    height: 55px !important;
+}
+
+:where(.vi__character) {
+    position: relative !important;
+    background: #FFFFFF !important;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 5px !important;
+    border: 1px solid #eee !important;
+    &::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        border-radius: 10px;
+        background: #32323224;
+        bottom: -8px;
+        left: 0;
+    }
+}
+:where(.vi__character--selected) {
+    outline-color: $primaryColor !important;
+    color: $primaryColor !important;
+    &::before {
+        background: $primaryColor;
     }
 }
