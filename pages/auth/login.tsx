@@ -16,37 +16,27 @@ import ListItemText from '@mui/material/ListItemText';
 import { validatePhoneNumber } from 'utils/helpers';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import VerificationInput from "react-verification-input";
-
-// function numberToSmerinke(number: number): string {
-//     const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
-//     const digitsArr = String(number).split('');
-//     const smerinkeArr = digitsArr.map((digit: any) => smerinkeDigits[digit]);
-//     return smerinkeArr.join('');
-// }
-
-// function smerinkeToNumber(smerinkeString: string): number {
-//     const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
-//     const smerinkeArr = smerinkeString.split('');
-//     const digitsArr = smerinkeArr.map(smerinke => smerinkeDigits.indexOf(smerinke));
-//     const number = parseInt(digitsArr.join(''), 10);
-//     return number;
-// }
+import { CheckCode, getCode, psotLogin, psotSignUp } from 'services/post.api';
+import { IconButton } from '@mui/material';
 
 function Login() {
     const [phone, setPhone] = React.useState<string>("");
     const [number, setNumber] = React.useState<number>(0);
+    const [token, setToken] = React.useState<string>("");
     const [isPhone, setIsPhone] = React.useState<Boolean>(false);
 
     let page = [
-        <PhoneNumberPage phone={phone} setNumber={setNumber} setPhone={setPhone} isPhone={isPhone} setIsPhone={setIsPhone} key={0} />,
-        <VerificationCodePage phone={phone} setNumber={setNumber} />
+        <PhoneNumberPage phone={phone} setNumber={setNumber} setToken={setToken} setPhone={setPhone} isPhone={isPhone} setIsPhone={setIsPhone} key={0} />,
+        <VerificationCodePage setToken={setToken} phone={phone} setNumber={setNumber} token={token} />,
+        <PasswordPage phone={phone} />,
+        <UserInfoPage phone={phone} />
     ]
 
     return (
         <div className='ani-showpage'>
             <ThemeProvider theme={theme}>
                 <div className="bg-white h-screen flex justify-center items-center flex-col p-2">
-                    <Button onClick={() => setNumber(number === 1 ? 0 : 0)} sx={{ alignSelf: "end", mb: "auto", mt: 1 }}>
+                    <Button onClick={() => setNumber(number === 1 ? 0 : number === 3 ? 1 : number === 2 ? 0 : 0)} sx={{ alignSelf: "end", mb: "auto", mt: 1 }}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 8.75H4.7875L11.775 1.7625L10 0L0 10L10 20L11.7625 18.2375L4.7875 11.25H20V8.75Z" fill="#323232" />
                         </svg>
@@ -70,16 +60,28 @@ interface IPageNumber {
     setIsPhone: React.Dispatch<React.SetStateAction<Boolean>>,
     setNumber: React.Dispatch<React.SetStateAction<number>>,
     setPhone: React.Dispatch<React.SetStateAction<string>>,
+    setToken: React.Dispatch<React.SetStateAction<string>>,
 }
 
-const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, isPhone, setIsPhone }) => {
+
+const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, isPhone, setIsPhone, setToken }) => {
     const [isError, setIsError] = React.useState<boolean>(false);
 
     const handleSubmitPhone = (e: React.FormEvent<HTMLFormElement>): void | boolean => {
         e.preventDefault();
 
         if (isPhone) {
-            setNumber(1)
+            getCode({ phone }).then(res => {
+                setToken(res.data.token)
+                if (res.data.isExist) {
+                    setNumber(2)
+                } else {
+                    setNumber(1)
+                }
+            })
+                .catch(() => {
+                    setIsError(true)
+                })
         } else {
             setIsError(true)
         }
@@ -89,7 +91,6 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
         setPhone(e.target.value);
         setIsError(false)
         setIsPhone(validatePhoneNumber(e.target.value));
-
     }
 
 
@@ -199,24 +200,26 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
 
 interface INumber {
     phone: string,
+    token: string,
+    setToken: React.Dispatch<React.SetStateAction<string>>,
     setNumber: React.Dispatch<React.SetStateAction<number>>,
 }
 
-const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone }) => {
+const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone, token, setToken }) => {
     const [downTime, setDownTime] = React.useState<number>(120);
+    const [change, setChange] = React.useState<Date>(new Date());
+    const [err, setErr] = React.useState<Boolean>(false);
 
     let seconds = 120
-    function countdown(): any {
-        if (seconds > 0) {
-            seconds--;
-        } else {
-            seconds = 0
-        }
-
-        return seconds
-    }
-
     React.useEffect(() => {
+        function countdown(): any {
+            if (seconds > 0) {
+                seconds--;
+            } else {
+                seconds = 0
+            }
+            return seconds
+        }
         document.querySelector("input.vi")?.setAttribute("inputmode", "numeric")
 
         let time = setInterval(() => {
@@ -227,7 +230,26 @@ const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone }) => {
             clearInterval(time);
         }
 
-    }, [])
+    }, [change])
+
+    const getValueCode = (code: string) => {
+        CheckCode({ code }, token).then(() => {
+            setNumber(3)
+            setErr(false)
+        })
+            .catch(() => {
+                setErr(true)
+            })
+    }
+
+    const handleSubmitPhone = (): void | boolean => {
+
+        getCode({ phone }).then(res => {
+            seconds = 120
+            setChange(new Date())
+            setToken(res.data.token)
+        })
+    }
 
     return (
         <div className='mb-auto'>
@@ -237,15 +259,198 @@ const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone }) => {
                     <span onClick={() => setNumber(0)} className='font-normal text-[13px] mt-5'></span>
                     <span onClick={() => setNumber(0)} className='font-normal text-[13px] mt-5 underline text-blue-500'>شماره تلفن اشتباه است</span>
                 </div>
-                <VerificationInput length={4} placeholder="" />
+                <VerificationInput
+                    onChange={() => setErr(false)}
+                    classNames={{
+                        character: err ? "vi__character--err" : "",
+                    }} onComplete={getValueCode} length={4} placeholder="" />
                 {
                     downTime === 0 ?
-                        <p dir="rtl" className='text-[#3232324d] font-normal text-[13px] text-center mr-3 mt-20  underline'>ارسال مجدد کد تایید</p>
+                        <p dir="rtl" className='text-[#3232324d] font-normal text-[13px] text-center mr-3 mt-20  underline' onClick={handleSubmitPhone}>ارسال مجدد کد تایید</p>
                         :
                         <p dir="rtl" className='text-[#3232324d] font-normal text-[13px] text-center mr-3 mt-20'>  تا ارسال مجدد کد تایید
                             {Math.floor(downTime / 60) > 10 ? Math.floor(downTime / 60) : ("0" + Math.floor(downTime / 60)) + ":" + (downTime % 60 < 10 ? "0" + (downTime % 60) : downTime % 60)}</p>
                 }
             </div>
         </div>
+    )
+}
+
+interface IPassword {
+    phone: string,
+}
+
+const PasswordPage: React.FC<IPassword> = ({ phone }) => {
+    const [password, setPassword] = React.useState<String>("");
+    const [show, setShow] = React.useState<Boolean>(false);
+
+    function getChangeValue(e: React.ChangeEvent<HTMLInputElement>): void {
+        setPassword(e.target.value);
+    }
+
+    const handleSubmitPhone = (e: React.FormEvent<HTMLFormElement>): void | boolean => {
+        e.preventDefault();
+        psotLogin({
+            phoneNumber: "+98" + (phone[0] === "0" ? phone.substring(1,) : phone),
+            password
+        }).then(() => {
+            alert("logined")
+        }).catch((err: Error) => {
+            console.log(err);
+        })
+    }
+
+    return (
+        <div className='mb-auto'>
+            <form className="p-4 flex justify-center items-start flex-col mb-auto" onSubmit={handleSubmitPhone}>
+                <label className='mr-2 text-[15px]' htmlFor="input-with-icon-adornment">
+                    رمز عبور خود را وارد کنید
+                </label>
+                <FormControl sx={{ mt: 1, "div": { borderRadius: 50 }, "input::placeholder": { textAlign: "end" } }} dir="auto" className='rounded-[100px] w-full' variant="outlined">
+                    <OutlinedInput
+                        // error={isError}
+                        placeholder="رمز عبور"
+                        type={show ? "text" : "password"}
+                        id='password'
+                        sx={{ px: 2 }}
+                        className='rounded-[100px]'
+                        onChange={getChangeValue}
+                        startAdornment={
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShow(!show)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-eye" viewBox="0 0 16 16">
+                                        {
+                                            !show ?
+                                                <>
+                                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                                </>
+                                                :
+                                                <>
+                                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z" />
+                                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z" />
+                                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z" />
+                                                </>
+                                        }
+                                    </svg>
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+                <Button type='submit' variant='contained' sx={{ borderRadius: 50, mt: 2.4, p: 2, mb: 10 }} fullWidth>ادامه</Button>
+                <Typography>
+                    <List
+                        sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+                        component="nav"
+                        aria-labelledby="nested-list-subheader"
+                    >
+                        <button>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-chat-left-text" viewBox="0 0 16 16">
+                                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
+                                    </svg>
+                                </ListItemIcon>
+                                <ListItemText sx={{ "span": { fontSize: 13, color: "#525252" } }} primary="ارسال کد یکبار مصرف بصورت پیامک" />
+                            </ListItemButton>
+                        </button>
+                    </List>
+                </Typography>
+            </form>
+        </div >
+    )
+}
+
+interface IInfo {
+    phone: string
+}
+
+interface IValue {
+    firstname: string,
+    lastname: string
+}
+
+const UserInfoPage: React.FC<IInfo> = ({ phone }) => {
+    const [value, setvalue] = React.useState<IValue>({
+        firstname: "",
+        lastname: ""
+    });
+
+    function getChangeValue(e: React.ChangeEvent<HTMLInputElement>): void {
+        setvalue({ ...value, [e.target.name]: e.target.value });
+    }
+
+    const handleSubmitPhone = (e: React.FormEvent<HTMLFormElement>): void | boolean => {
+        e.preventDefault();
+        if (!value.firstname) {
+            alert("نام وارد کن")
+            return false
+        }
+        else if (!value.lastname) {
+            alert("نام خانوادگی وارد کن")
+            return false
+        } else {
+            psotSignUp({
+                phoneNumber: "+98" + (phone[0] === "0" ? phone.substring(1,) : phone),
+                firstname: value.firstname,
+                lastname: value.lastname
+            }).then(() => {
+                alert("با موفقیت وارد شدید -هنوز صفحه بعدی وجود نداره بری صفحه اصلی")
+            }).catch((err: Error) => {
+                console.log(err);
+            })
+        }
+    }
+
+    return (
+        <div className='mb-auto'>
+            <form className="p-4 flex justify-center items-start flex-col mb-auto" onSubmit={handleSubmitPhone}>
+                <h2 className="text-[38px] text-[#76B947] mb-10 m-auto">!برنج</h2>
+                <label className='mr-2 text-[15px]' htmlFor="input-with-icon-adornment">
+                    نام و نام خانوادگی خود را وراد کنید
+                </label>
+                <FormControl sx={{ mt: 1, "div": { borderRadius: 50 } }} className='rounded-[100px] w-full' variant="outlined">
+                    <OutlinedInput
+                        placeholder="نام"
+                        type="text"
+                        id='password'
+                        name='firstname'
+                        sx={{ pl: 1 }}
+                        className='rounded-[100px]'
+                        onChange={getChangeValue}
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <IconButton>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                    </svg>
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+                <FormControl sx={{ mt: 1, "div": { borderRadius: 50 } }} className='rounded-[100px] w-full' variant="outlined">
+                    <OutlinedInput
+                        placeholder="نام خانوادگی"
+                        type='text'
+                        id='password'
+                        name='lastname'
+                        sx={{ pl: 2 }}
+                        className='rounded-[100px]'
+                        onChange={getChangeValue}
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-people" viewBox="0 0 16 16">
+                                    <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+                                </svg>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+                <Button type='submit' variant='contained' sx={{ borderRadius: 50, mt: 2.4, p: 2, mb: 10 }} fullWidth>تایید نهایی</Button>
+            </form>
+        </div >
     )
 }

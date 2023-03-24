@@ -13,3 +13,18 @@ export function countdown(): any {
 
     return seconds
 }
+
+export function numberToSmerinke(number: number): string {
+    const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
+    const digitsArr = String(number).split('');
+    const smerinkeArr = digitsArr.map((digit: any) => smerinkeDigits[digit]);
+    return smerinkeArr.join('');
+}
+
+export function smerinkeToNumber(smerinkeString: string): number {
+    const smerinkeDigits = ['ᒐ', '⎓', 'ꑍ', '৫', 'ꍌ', 'ꎭ', 'ಠ', 'Θ', '෴', '卐'];
+    const smerinkeArr = smerinkeString.split('');
+    const digitsArr = smerinkeArr.map(smerinke => smerinkeDigits.indexOf(smerinke));
+    const number = parseInt(digitsArr.join(''), 10);
+    return number;
+}

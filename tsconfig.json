@@ -18,6 +18,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "models/users.ts", "lib/mongodb.ts"],
   "exclude": ["node_modules"],
 }
