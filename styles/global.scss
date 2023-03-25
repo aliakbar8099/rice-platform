@@ -21,6 +21,10 @@ body {
     height: 100%;
 }
 
+*[disabled] {
+    background-color: $primaryColor + b7 !important;
+}
+
 .bg-primaryColor {
     background: $primaryColor;
 }
@@ -154,6 +158,7 @@ $baseColor: #B1D8B7;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25) !important;
     border-radius: 5px !important;
     border: 1px solid #eee !important;
+
     &::before {
         content: "";
         position: absolute;
@@ -169,6 +174,7 @@ $baseColor: #B1D8B7;
 :where(.vi__character--selected) {
     outline-color: $primaryColor !important;
     color: $primaryColor !important;
+
     &::before {
         background: $primaryColor;
     }
@@ -177,13 +183,16 @@ $baseColor: #B1D8B7;
 .vi__character--err.vi__character--selected {
     outline-color: #ff0000 !important;
     color: #ff0000 !important;
+
     &::before {
         background: #ff0000 !important;
     }
 }
+
 .vi__character--err {
     box-shadow: 0px 0px 5px rgba(255, 0, 0, 0.25) !important;
     border: 1px solid #ff0000 !important;
+
     &::before {
         background: #ff0000 !important;
     }

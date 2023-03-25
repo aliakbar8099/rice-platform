@@ -18,6 +18,8 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import VerificationInput from "react-verification-input";
 import { CheckCode, getCode, psotLogin, psotSignUp } from 'services/post.api';
 import { IconButton } from '@mui/material';
+import AlertDialog from 'components/common/modal';
+import { AxiosError } from 'axios';
 
 function Login() {
     const [phone, setPhone] = React.useState<string>("");
@@ -63,23 +65,38 @@ interface IPageNumber {
     setToken: React.Dispatch<React.SetStateAction<string>>,
 }
 
-
 const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, isPhone, setIsPhone, setToken }) => {
     const [isError, setIsError] = React.useState<boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [open, setOpen] = React.useState<boolean>(false);
+    const [modalContent, setModaContent] = React.useState<{ title: string, body: JSX.Element | string }>({
+        title: "",
+        body: ""
+    })
 
     const handleSubmitPhone = (e: React.FormEvent<HTMLFormElement>): void | boolean => {
         e.preventDefault();
-
+        setLoading(true)
         if (isPhone) {
             getCode({ phone }).then(res => {
                 setToken(res.data.token)
+                setLoading(false)
                 if (res.data.isExist) {
                     setNumber(2)
                 } else {
                     setNumber(1)
                 }
             })
-                .catch(() => {
+                .catch((err = { response: { status: 500 } }) => {
+                    if (err.response.status === 429) {
+                        setOpen(true)
+                        setModaContent({
+                            title:"تلاش بیش از حد!",
+                            body:"لطفا یک ساعت دیگر دوباره تلاش کنید درصورت هر گونه مشکل با پشتیبانی تماس بگیرید"
+                        })
+                    }
+
+                    setLoading(false)
                     setIsError(true)
                 })
         } else {
@@ -92,7 +109,6 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
         setIsError(false)
         setIsPhone(validatePhoneNumber(e.target.value));
     }
-
 
     return (
         <>
@@ -132,7 +148,18 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
                         }
                     />
                 </FormControl>
-                <Button type='submit' variant='contained' sx={{ borderRadius: 50, mt: 2.4, p: 2, mb: 10 }} fullWidth>تایید</Button>
+                <Button disabled={loading} type='submit' variant='contained' sx={{ borderRadius: 50, mt: 2.4, p: 2, mb: 10 }} fullWidth>
+                    {
+                        loading ?
+                            <div className="spinner">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            :
+                            "تایید"
+                    }
+                </Button>
                 <Accordion sx={{ "&::before": { opacity: 0 } }}>
                     <AccordionSummary
                         aria-controls="panel1a-content"
@@ -193,6 +220,7 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
                     </AccordionDetails>
                 </Accordion>
             </form>
+            <AlertDialog open={open} setOpen={setOpen} title={modalContent.title} body={modalContent.body} />
         </>
     )
 }

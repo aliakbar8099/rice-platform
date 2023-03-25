@@ -8,7 +8,7 @@ const axios = require('axios');
 const { response } = require('middleware/response')
 
 const limiter = rateLimit({
-    interval: 60 * 1000, // 60 seconds
+    interval: 3600 * 1000, // 3600 seconds = 1 hours
     uniqueTokenPerInterval: 500, // Max 500 users per second
 })
 
