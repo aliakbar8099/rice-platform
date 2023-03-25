@@ -19,7 +19,6 @@ import VerificationInput from "react-verification-input";
 import { CheckCode, getCode, psotLogin, psotSignUp } from 'services/post.api';
 import { IconButton } from '@mui/material';
 import AlertDialog from 'components/common/modal';
-import { AxiosError } from 'axios';
 
 function Login() {
     const [phone, setPhone] = React.useState<string>("");
