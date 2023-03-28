@@ -8,8 +8,7 @@ import createCache from "@emotion/cache";
 // importing AppProps type from next/app
 import type { AppProps } from 'next/app'
 
-// importing NextRouter and useRouter hooks from next/router
-import { NextRouter, useRouter } from 'next/router'
+
 import Splashscreen from "../components/common/Splashscreen"
 
 // defining IPageLoad interface to have splashscreen and main as JSX element
@@ -33,9 +32,6 @@ type AppPageProps = AppProps & {
  */
 export default function MyApp({ Component, pageProps }: AppPageProps) {
   const getLayout = Component.getLayout || ((page) => page)
-
-  // use NextRouter to get router object for navigating between client-side pages
-  const router: NextRouter = useRouter()
 
   const [loadinpage, setloadpage] = useState<Boolean>(true);
 
