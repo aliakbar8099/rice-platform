@@ -192,7 +192,6 @@ $baseColor: #B1D8B7;
 .vi__character--err {
     box-shadow: 0px 0px 5px rgba(255, 0, 0, 0.25) !important;
     border: 1px solid #ff0000 !important;
-
     &::before {
         background: #ff0000 !important;
     }

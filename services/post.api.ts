@@ -19,3 +19,8 @@ export async function psotSignUp(data: {}) {
     let apiCall = await instance.post("/auth/users", data)
     return apiCall;
 }
+// re request code 
+export async function getReCode(data: {}) {
+    let apiCall = await instance.post("/auth/verifycode?notCheck=true", data)
+    return apiCall;
+}

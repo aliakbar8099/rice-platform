@@ -1,121 +1,156 @@
 .loader {
-    --ballcolor: #f2f2f2;
-    --shadow: 0px 0 #ffffff00;
-    --shadowcolor: #ffffff00;
-    width: 10px;
-    height: 10px;
-    left: -120px;
-    border-radius: 50%;
-    position: relative;
-    color: var(--ballcolor);
-    animation: shadowRolling 2s linear infinite;
-  }
-  
-  @keyframes shadowRolling {
-    
-    0% {
-      box-shadow: var(--shadow),
-          var(--shadow),
-          var(--shadow),
-          var(--shadow);
-    }
-  
-    12% {
-      box-shadow: 100px 0 var(--ballcolor),
-          var(--shadow),
-          var(--shadow), 
-          var(--shadow);
-    }
-  
-    25% {
-      box-shadow: 110px 0 var(--ballcolor),
-          100px 0 var(--ballcolor),
-          var(--shadow), 
-          var(--shadow);
-    }
-  
-    36% {
-      box-shadow: 120px 0 var(--ballcolor), 
-          110px 0 var(--ballcolor), 
-          100px 0 var(--ballcolor), 
-           var(--shadow);
-    }
-  
-    50% {
-      box-shadow: 130px 0 var(--ballcolor),
-          120px 0 var(--ballcolor),
-          110px 0 var(--ballcolor),
-          100px 0 var(--ballcolor);
-    }
-  
-    62% {
-      box-shadow: 200px 0 var(--shadowcolor),
-           130px 0 var(--ballcolor), 
-           120px 0 var(--ballcolor), 
-           110px 0 var(--ballcolor);
-    }
-  
-    75% {
-      box-shadow: 200px 0 var(--shadowcolor),
-          200px 0 var(--shadowcolor),
-          130px 0 var(--ballcolor), 
-          120px 0 var(--ballcolor);
-    }
-  
-    87% {
-      box-shadow: 200px 0 var(--shadowcolor), 
-          200px 0 var(--shadowcolor), 
-          200px 0 var(--shadowcolor), 
-          130px 0 var(--ballcolor);
-    }
-  
-    100% {
-      box-shadow: 200px 0 var(--shadowcolor), 
-          200px 0 var(--shadowcolor),
-          200px 0 var(--shadowcolor),
-          200px 0 var(--shadowcolor);
-    }
+  --ballcolor: #f2f2f2;
+  --shadow: 0px 0 #ffffff00;
+  --shadowcolor: #ffffff00;
+  width: 10px;
+  height: 10px;
+  left: -120px;
+  border-radius: 50%;
+  position: relative;
+  color: var(--ballcolor);
+  animation: shadowRolling 2s linear infinite;
+}
+
+@keyframes shadowRolling {
+
+  0% {
+    box-shadow: var(--shadow),
+      var(--shadow),
+      var(--shadow),
+      var(--shadow);
   }
 
-  .spinner {
-    --clr: #fff;
-    --gap: 6px;
-      /* gap between each circle */
-    width: auto;
-    height: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--gap);
-   }
-   
-   .spinner span {
-    width: 20px;
-    height: 20px;
-    border-radius: 100%;
-    background-color: var(--clr);
+  12% {
+    box-shadow: 100px 0 var(--ballcolor),
+      var(--shadow),
+      var(--shadow),
+      var(--shadow);
+  }
+
+  25% {
+    box-shadow: 110px 0 var(--ballcolor),
+      100px 0 var(--ballcolor),
+      var(--shadow),
+      var(--shadow);
+  }
+
+  36% {
+    box-shadow: 120px 0 var(--ballcolor),
+      110px 0 var(--ballcolor),
+      100px 0 var(--ballcolor),
+      var(--shadow);
+  }
+
+  50% {
+    box-shadow: 130px 0 var(--ballcolor),
+      120px 0 var(--ballcolor),
+      110px 0 var(--ballcolor),
+      100px 0 var(--ballcolor);
+  }
+
+  62% {
+    box-shadow: 200px 0 var(--shadowcolor),
+      130px 0 var(--ballcolor),
+      120px 0 var(--ballcolor),
+      110px 0 var(--ballcolor);
+  }
+
+  75% {
+    box-shadow: 200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor),
+      130px 0 var(--ballcolor),
+      120px 0 var(--ballcolor);
+  }
+
+  87% {
+    box-shadow: 200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor),
+      130px 0 var(--ballcolor);
+  }
+
+  100% {
+    box-shadow: 200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor),
+      200px 0 var(--shadowcolor);
+  }
+}
+
+.spinner {
+  --clr: #fff;
+  --gap: 6px;
+  /* gap between each circle */
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap);
+}
+
+.spinner span {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color: var(--clr);
+  opacity: 0;
+}
+
+.spinner span:nth-child(1) {
+  animation: fade 1s ease-in-out infinite;
+}
+
+.spinner span:nth-child(2) {
+  animation: fade 1s ease-in-out 0.33s infinite;
+}
+
+.spinner span:nth-child(3) {
+  animation: fade 1s ease-in-out 0.66s infinite;
+}
+
+@keyframes fade {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  60% {
     opacity: 0;
-   }
-   
-   .spinner span:nth-child(1) {
-    animation: fade 1s ease-in-out infinite;
-   }
-   
-   .spinner span:nth-child(2) {
-    animation: fade 1s ease-in-out 0.33s infinite;
-   }
-   
-   .spinner span:nth-child(3) {
-    animation: fade 1s ease-in-out 0.66s infinite;
-   }
-   
-   @keyframes fade {
-    0%, 100% {
-     opacity: 1;
-    }
-   
-    60% {
-     opacity: 0;
-    }
-   }
-   
+  }
+}
+
+#navbar_v {
+  svg {
+    transition: 0.25s ease-in-out;
+  }
+}
+
+.active_btn-nav {
+  background: #fff;
+  color: #000;
+  svg path{
+    fill: #000;
+  }
+  svg {
+    transform: scale(1.15);
+  }
+}
+
+.select_nav {
+  transform: translate(0,-50%);
+  width: 40px;
+  animation: Nva 1s ease;
+}
+
+@keyframes Nva {
+  from {
+    transform: translate(-50%,-50%);
+    width: 80px;
+  }
+  to {
+    transform: translate(0,-50%);
+    width: 40px;
+  }
+}

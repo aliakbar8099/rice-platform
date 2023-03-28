@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === "POST") {
         try {
-            await limiter.check(res, 5, 'CACHE_TOKEN') // 10 requests per minute
+            await limiter.check(res, 500, 'CACHE_TOKEN') // 10 requests per minute
             if (req.query.token) {
                 try {
 
@@ -37,9 +37,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     }
 
                     const decodedToken = jwt.verify(req.query.token, secretKey);
-
                     if (code === JSON.stringify(smerinkeToNumber(decodedToken.code))) {
-                        return response(200, res, "کد تاییداست")
+
+                        let findUser: any = await user.findOne({ phoneNumber: !/^(\+98)/.test(phone) ? "+98" + (phone[0] === "0" ? phone.substring(1,) : phone) : phone });
+
+                        if (!findUser) {
+                            return response(200, res, "کد تاییداست", { isExist: false })
+                        }
+                        else {
+                            const payload = {
+                                user: {
+                                    userId: findUser.userId,
+                                    isSeller: findUser.isSeller
+                                }
+                            };
+
+                            jwt.sign(
+                                payload,
+                                "randomString",
+                                {
+                                    expiresIn: 3600 * 24
+                                },
+                                (err: Error, token: string) => {
+                                    if (err) throw err;
+                                    return response(200, res, "شما وارد شده اید", { token, isExist: true })
+                                }
+                            );
+                        }
+
+
                     } else {
                         return response(401, res, "کد درست نیست")
                     }
@@ -48,13 +74,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     console.error(err);
                     response(401, res, "کد نا معتبر است")
                 }
-            } else {
+            }
+            else {
                 if (!phone) {
                     response(400, res, "شماره موبایل وارد نشده")
                 }
                 if (await user.findOne({
                     phoneNumber: !/^(\+98)/.test(phone) ? "+98" + (phone[0] === "0" ? phone.substring(1,) : phone) : phone
-                })) {
+                }) && !req.query.notCheck || (req.query.notCheck && !Array.isArray(req.query.notCheck) && !JSON.parse(req.query.notCheck))) {
                     response(200, res, "با این شماره قبلا ثبت نام کرده اید", { isExist: true })
                 } else {
                     const token = jwt.sign(payload, secretKey, { expiresIn: 60 * 10 });
@@ -74,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         }
                     };
                     axios.request(options).then(function (_: any) {
-                        response(200, res, "پیامک با کد ارسال شد", { isExist: false, token })
+                        response(200, res, "پیامک با کد ارسال شد", { isExist: false, token, reqPhone: '+98' + (phone[0] === "0" ? phone.substring(1) : phone) })
                     }).catch(function (error: Error) {
                         console.error(error);
                     });

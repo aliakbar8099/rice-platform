@@ -16,9 +16,10 @@ import ListItemText from '@mui/material/ListItemText';
 import { validatePhoneNumber } from 'utils/helpers';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import VerificationInput from "react-verification-input";
-import { CheckCode, getCode, psotLogin, psotSignUp } from 'services/post.api';
-import { IconButton } from '@mui/material';
+import { CheckCode, getCode, getReCode, psotLogin, psotSignUp } from 'services/post.api';
+import { CircularProgress, IconButton } from '@mui/material';
 import AlertDialog from 'components/common/modal';
+import { useRouter } from 'next/router';
 
 function Login() {
     const [phone, setPhone] = React.useState<string>("");
@@ -29,7 +30,7 @@ function Login() {
     let page = [
         <PhoneNumberPage phone={phone} setNumber={setNumber} setToken={setToken} setPhone={setPhone} isPhone={isPhone} setIsPhone={setIsPhone} key={0} />,
         <VerificationCodePage setToken={setToken} phone={phone} setNumber={setNumber} token={token} />,
-        <PasswordPage phone={phone} />,
+        <PasswordPage phone={phone} setNumber={setNumber} setToken={setToken} />,
         <UserInfoPage phone={phone} />
     ]
 
@@ -90,8 +91,8 @@ const PhoneNumberPage: React.FC<IPageNumber> = ({ setNumber, setPhone, phone, is
                     if (err.response.status === 429) {
                         setOpen(true)
                         setModaContent({
-                            title:"تلاش بیش از حد!",
-                            body:"لطفا یک ساعت دیگر دوباره تلاش کنید درصورت هر گونه مشکل با پشتیبانی تماس بگیرید"
+                            title: "تلاش بیش از حد!",
+                            body: "لطفا یک ساعت دیگر دوباره تلاش کنید درصورت هر گونه مشکل با پشتیبانی تماس بگیرید"
                         })
                     }
 
@@ -233,6 +234,7 @@ interface INumber {
 }
 
 const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone, token, setToken }) => {
+    const router = useRouter()
     const [downTime, setDownTime] = React.useState<number>(120);
     const [change, setChange] = React.useState<Date>(new Date());
     const [err, setErr] = React.useState<Boolean>(false);
@@ -260,8 +262,13 @@ const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone, token, setT
     }, [change])
 
     const getValueCode = (code: string) => {
-        CheckCode({ code }, token).then(() => {
-            setNumber(3)
+        CheckCode({ code, phone }, token).then((res) => {
+            if (res.data.isExist) {
+                localStorage.setItem("token", res.data.token)
+                router.push("/")
+            } else {
+                setNumber(3)
+            }
             setErr(false)
         })
             .catch(() => {
@@ -305,11 +312,15 @@ const VerificationCodePage: React.FC<INumber> = ({ setNumber, phone, token, setT
 
 interface IPassword {
     phone: string,
+    setNumber: React.Dispatch<React.SetStateAction<number>>,
+    setToken: React.Dispatch<React.SetStateAction<string>>,
 }
 
-const PasswordPage: React.FC<IPassword> = ({ phone }) => {
+const PasswordPage: React.FC<IPassword> = ({ phone, setNumber, setToken }) => {
+    const router = useRouter()
     const [password, setPassword] = React.useState<String>("");
     const [show, setShow] = React.useState<Boolean>(false);
+    const [loading, setLoading] = React.useState<Boolean>(false);
 
     function getChangeValue(e: React.ChangeEvent<HTMLInputElement>): void {
         setPassword(e.target.value);
@@ -320,10 +331,20 @@ const PasswordPage: React.FC<IPassword> = ({ phone }) => {
         psotLogin({
             phoneNumber: "+98" + (phone[0] === "0" ? phone.substring(1,) : phone),
             password
-        }).then(() => {
-            alert("logined")
+        }).then((res) => {
+            localStorage.setItem("token", res.data.token)
+            router.push("/")
         }).catch((err: Error) => {
             console.log(err);
+        })
+    }
+
+    function handleReCode(): void {
+        setLoading(true)
+        getReCode({ phone }).then(res => {
+            setNumber(1)
+            setToken(res.data.token)
+            setLoading(false)
         })
     }
 
@@ -375,12 +396,17 @@ const PasswordPage: React.FC<IPassword> = ({ phone }) => {
                         <button>
                             <ListItemButton>
                                 <ListItemIcon>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-chat-left-text" viewBox="0 0 16 16">
-                                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-                                        <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
-                                    </svg>
+                                    {
+                                        loading ?
+                                            <CircularProgress size={22} />
+                                            :
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-chat-left-text" viewBox="0 0 16 16">
+                                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
+                                            </svg>
+                                    }
                                 </ListItemIcon>
-                                <ListItemText sx={{ "span": { fontSize: 13, color: "#525252" } }} primary="ارسال کد یکبار مصرف بصورت پیامک" />
+                                <ListItemText onClick={handleReCode} sx={{ "span": { fontSize: 13, color: "#525252" } }} primary="ارسال کد یکبار مصرف بصورت پیامک" />
                             </ListItemButton>
                         </button>
                     </List>
@@ -400,6 +426,7 @@ interface IValue {
 }
 
 const UserInfoPage: React.FC<IInfo> = ({ phone }) => {
+    const router = useRouter()
     const [value, setvalue] = React.useState<IValue>({
         firstname: "",
         lastname: ""
@@ -423,8 +450,9 @@ const UserInfoPage: React.FC<IInfo> = ({ phone }) => {
                 phoneNumber: "+98" + (phone[0] === "0" ? phone.substring(1,) : phone),
                 firstname: value.firstname,
                 lastname: value.lastname
-            }).then(() => {
-                alert("با موفقیت وارد شدید -هنوز صفحه بعدی وجود نداره بری صفحه اصلی")
+            }).then((res: any) => {
+                localStorage.setItem("token", res.token)
+                router.push("/")
             }).catch((err: Error) => {
                 console.log(err);
             })

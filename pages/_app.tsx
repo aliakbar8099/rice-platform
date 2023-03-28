@@ -18,12 +18,21 @@ interface IPageLoad {
   main: JSX.Element
 }
 
+interface PageWithLayout {
+  getLayout: (page: JSX.Element) => JSX.Element
+}
+
+type AppPageProps = AppProps & {
+  Component: PageWithLayout
+}
+
 /**
  * MyApp Component is the base component for Next.js pages.
  * @param Component represent current page's component.
  * @param pageProps The initial properties that were preloaded for your page.
  */
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppPageProps) {
+  const getLayout = Component.getLayout || ((page) => page)
 
   // use NextRouter to get router object for navigating between client-side pages
   const router: NextRouter = useRouter()
@@ -32,8 +41,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   // redirect user to /auth/login when the app first load
   useEffect(() => {
-    router.push("/auth/login");
-
     setloadpage(true)
     setTimeout(() => {
       setloadpage(false)
@@ -59,7 +66,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <CacheProvider value={cacheRtl}>
-        {PageLoad[loadinpage ? "splashscreen" : "main"]}
+        {
+          getLayout(PageLoad[loadinpage ? "splashscreen" : "main"])
+        }
       </CacheProvider>
     </>
   )
